@@ -1,5 +1,8 @@
 import sqlite3
 
+import keyboard
+
+
 
 def search_word_in_database(word):
     # Connect to the database
@@ -8,12 +11,13 @@ def search_word_in_database(word):
 
     # Execute a query to search for the input word in the 'Kelime' table
     cursor.execute("SELECT Osmanlica FROM Kelime WHERE latince = ?", (word,))
-    result = cursor.fetchone()
+    result = cursor.fetchmany(5)
 
     # Check if the word was found
     if result:
-        corresponding_word = result[0]
-        print(f"The corresponding word for '{word}' in Osmanlica is '{corresponding_word}'.")
+        for row in result:
+            corresponding_word = row
+            print(f"{corresponding_word}\n")
     else:
         print(f"No corresponding word found for '{word}'.")
 
@@ -21,9 +25,31 @@ def search_word_in_database(word):
     conn.close()
 
 
-if __name__ == "__main__":
-    # Ask user to input a word to search
-    search_word = input("Enter the word to search: ")
+search_word = ""
 
-    # Call the function to search for the word in the database
-    search_word_in_database(search_word)
+if __name__ == "__main__":
+
+    # search_word = input("Enter the word to search: ")
+    while True:
+        event = keyboard.read_event()
+        if event.event_type == keyboard.KEY_DOWN:
+            key = event.name
+            if key == "backspace":
+                search_word = search_word[:-1]
+                print(f"{search_word}\n")
+            elif key == "space":
+                search_word = search_word + " "
+                print(f"{search_word}\n")
+            else:
+                search_word += key
+                print(f"{search_word}\n")
+            if search_word != "":
+                # Call the function to search for the word in the database
+                search_word_in_database(search_word)
+
+                # Ask user to input a word to search
+                # search_word = input("Enter the word to search: ")
+
+                # if user enters exit keyword break the loop
+                if search_word == "exit":
+                    break
