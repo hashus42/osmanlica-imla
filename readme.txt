@@ -1,0 +1,1 @@
+Inspect the database with sqlitebrowser imlakilavuzu3.db
