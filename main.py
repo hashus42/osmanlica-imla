@@ -37,15 +37,9 @@ class App(ctk.CTk):
                                "i", "j", "k", "l", "m", "n", "o", "p",
                                "q", "r", "s", "t", "u", "v", "w", "y",
                                "x", "y", "z", "/", "\\"]
-        fake_turkish_letters = ["ç", "ğ", "ö", "ş", "ü"]
-        correspond_for_fakes = ["c", "g", "o", "s", "u"]
 
-        # If user enters an uppercase word or a word includes some fake or made-up
-        # fake-turkish alphabet letter, then this code-block handle the issue
+        # If user enters an uppercase
         word = word.lower()
-        for j in range(len(fake_turkish_letters)):
-            if fake_turkish_letters[j] in word:
-                word = word.replace(fake_turkish_letters[j], correspond_for_fakes[j])
 
         # Connect to database
         conn = sqlite3.connect("/home/pardusumsu/code/osmanlica-imla/imlakilavuzu3.db")
