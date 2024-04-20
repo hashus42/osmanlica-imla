@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 import sqlite3
 
+from tkinter import PhotoImage
 import customtkinter as ctk
+
 import arabic_reshaper
 from bidi.algorithm import get_display
 
@@ -13,8 +15,10 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.text = None
-        self.title("Osmanlica imla")
+        self.title("Osmanlica imla - @hashusturkmen")
         self.geometry("800x600")
+        img = PhotoImage(file="/home/pardusumsu/code/osmanlica-imla/icons/osmanlica-imla-logo.png")
+        self.call("wm", "iconphoto", self._w, img)
 
         # Configure window
         self.columnconfigure(1, weight=1)
