@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import sqlite3
 
 import customtkinter as ctk
@@ -43,7 +44,7 @@ class App(ctk.CTk):
                 word = word.replace(fake_turkish_letters[j], correspond_for_fakes[j])
 
         # Connect to database
-        conn = sqlite3.connect("imlakilavuzu3.db")
+        conn = sqlite3.connect("/home/pardusumsu/code/osmanlica-imla/imlakilavuzu3.db")
         cursor = conn.cursor()
 
         # Execute a query to search for the intended word in database
@@ -53,6 +54,10 @@ class App(ctk.CTk):
             else:
                 cursor.execute("SELECT Osmanlica FROM Kelime WHERE latince LIKE ?", (word + "%",))
                 result = cursor.fetchmany(19)
+                cursor.execute("SELECT Osmanlica FROM Kelime WHERE latince = ?", (word,))
+                exact_result = cursor.fetchone()
+                if exact_result:
+                    result.insert(0, exact_result)
         except sqlite3.Error as error:
             print(error)
 
