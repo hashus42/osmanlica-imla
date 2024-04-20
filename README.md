@@ -13,5 +13,5 @@ communication for suggestions:
 twitter: @hashusturkmen
 mail: hsnhsyntrkmn@gmail.com
 
-![Dark Theme](https://github.com/hashus42/osmanlica-imla/screenshots/dark-theme.png)
-![Light Theme](https://github.com/hashus42/osmanlica-imla/screenshots/light-theme.png)
+![Dark Theme](https://github.com/hashus42/osmanlica-imla/blob/main/screenshots/dark-theme.png)
+![Light Theme](https://github.com/hashus42/osmanlica-imla/blob/main/screenshots/light-theme.png)
