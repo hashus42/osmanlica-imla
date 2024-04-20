@@ -17,18 +17,30 @@ class App(ctk.CTk):
 
         # Configure window
         self.columnconfigure(1, weight=1)
-        self.rowconfigure((1, 2, 3, 4, 5,
-                           6, 7, 8, 9, 10, 11, 12), weight=1)
+        self.rowconfigure(0, weight=0)
 
         # Create entry
         entry_var = ctk.StringVar()
-        self.entry = ctk.CTkEntry(self, placeholder_text="Kelimeyi giriniz", textvariable=entry_var)
-        self.entry.grid(row=0, column=1, ipadx=330, pady=5, columnspan=2)
+        self.entry = ctk.CTkEntry(self, placeholder_text="Kelimeyi giriniz", textvariable=entry_var, font=("Arial", 16))
+        self.entry.grid(row=0, column=1, ipadx=330, pady=0, columnspan=2)
         self.entry.focus_set()
         entry_var.trace("w", self.search_word)
 
     def search_word(self, *args):
         word = self.entry.get()
+        latin_letters_chars = ["a", "b", "c", "d", "e", "f", "g", "h",
+                               "i", "j", "k", "l", "m", "n", "o", "p",
+                               "q", "r", "s", "t", "u", "v", "w", "y",
+                               "x", "y", "z", "/", "\\"]
+        fake_turkish_letters = ["ç", "ğ", "ö", "ş", "ü"]
+        correspond_for_fakes = ["c", "g", "o", "s", "u"]
+
+        # If user enters an uppercase word or a word includes some fake or made-up
+        # fake-turkish alphabet letter, then this code-block handle the issue
+        word = word.lower()
+        for j in range(len(fake_turkish_letters)):
+            if fake_turkish_letters[j] in word:
+                word = word.replace(fake_turkish_letters[j], correspond_for_fakes[j])
 
         # Connect to database
         conn = sqlite3.connect("imlakilavuzu3.db")
@@ -36,8 +48,11 @@ class App(ctk.CTk):
 
         # Execute a query to search for the intended word in database
         try:
-            cursor.execute("SELECT Osmanlica FROM Kelime WHERE latince = ?", (word,))
-            result = cursor.fetchall()
+            if word == "":
+                result = []
+            else:
+                cursor.execute("SELECT Osmanlica FROM Kelime WHERE latince LIKE ?", (word + "%",))
+                result = cursor.fetchmany(19)
         except sqlite3.Error as error:
             print(error)
 
@@ -48,15 +63,25 @@ class App(ctk.CTk):
                     label.grid_forget()
             for corresponding_word in result:
                 i += 1
+
                 # This code is for linux computers. Linux based systems don't have built-in
                 # support for arabic fonts unlike Windows
                 corresponding_word = str(corresponding_word)[8:-3]
                 corresponding_word = arabic_reshaper.reshape(corresponding_word)
                 corresponding_word = get_display(corresponding_word)
 
-                # print(str(corresponding_word)[8:-3])
-                self.text = ctk.CTkLabel(self, width=150, text=corresponding_word, font=("Arial", 16), bg_color="green")
-                self.text.grid(row=i, column=1, pady=0)
+                # This code-blocks cleans any latin chars from ottoman turkish word
+                for num in range(10):
+                    if str(num) in corresponding_word:
+                        corresponding_word = corresponding_word.replace(str(num), '')
+
+                for char in latin_letters_chars:
+                    if char in corresponding_word:
+                        corresponding_word = corresponding_word.replace(char, '')
+
+                # Create ottoman word's display widget
+                self.text = ctk.CTkLabel(self, width=150, text=corresponding_word, font=("Arial", 16))
+                self.text.grid(row=i, column=1, pady=1)
                 self.text.setvar(word)
         elif word != "" and result == []:
             for label in self.grid_slaves():
