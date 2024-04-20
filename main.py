@@ -57,7 +57,8 @@ class App(ctk.CTk):
                 cursor.execute("SELECT Osmanlica FROM Kelime WHERE latince = ?", (word,))
                 exact_result = cursor.fetchone()
                 if exact_result:
-                    result.insert(0, exact_result)
+                    if exact_result not in result:
+                        result.insert(0, exact_result)
         except sqlite3.Error as error:
             print(error)
 
