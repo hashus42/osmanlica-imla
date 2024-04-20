@@ -16,7 +16,9 @@ class App(ctk.CTk):
         self.geometry("800x600")
 
         # Configure window
-        self.columnconfigure((1, 2), weight=1)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure((1, 2, 3, 4, 5,
+                           6, 7, 8, 9, 10, 11, 12), weight=1)
 
         # Create entry
         entry_var = ctk.StringVar()
@@ -41,6 +43,9 @@ class App(ctk.CTk):
 
         if result:
             i = 0
+            for label in self.grid_slaves():
+                if int(label.grid_info()['row']) > 0:
+                    label.grid_forget()
             for corresponding_word in result:
                 i += 1
                 # This code is for linux computers. Linux based systems don't have built-in
@@ -50,13 +55,20 @@ class App(ctk.CTk):
                 corresponding_word = get_display(corresponding_word)
 
                 # print(str(corresponding_word)[8:-3])
-                self.text = ctk.CTkLabel(self, width=150, text=corresponding_word, font=("Arial", 16))
-                self.text.grid(row=i, column=1)
+                self.text = ctk.CTkLabel(self, width=150, text=corresponding_word, font=("Arial", 16), bg_color="green")
+                self.text.grid(row=i, column=1, pady=0)
                 self.text.setvar(word)
-        # else:
-        #     alert = f"'{word}' için eşleşen bir kelime bulunamadı."
-        #     self.text = ctk.CTkLabel(self, width=80, text=alert)
-        #     self.text.grid(row=1, column=1)
+        elif word != "" and result == []:
+            for label in self.grid_slaves():
+                if int(label.grid_info()['row']) > 0:
+                    label.grid_forget()
+            alert = f"'{word}' için eşleşen bir kelime bulunamadı."
+            self.text = ctk.CTkLabel(self, width=80, text=alert)
+            self.text.grid(row=1, column=1)
+        else:
+            for label in self.grid_slaves():
+                if int(label.grid_info()['row']) > 0:
+                    label.grid_forget()
 
 
 if __name__ == "__main__":
