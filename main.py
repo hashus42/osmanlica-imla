@@ -1,55 +1,64 @@
 import sqlite3
 
-import keyboard
+import customtkinter as ctk
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+ctk.set_appearance_mode("system")
+ctk.set_default_color_theme("green")
 
 
+class App(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+        self.text = None
+        self.title("Osmanlica imla")
+        self.geometry("800x600")
 
-def search_word_in_database(word):
-    # Connect to the database
-    conn = sqlite3.connect('imlakilavuzu3.db')
-    cursor = conn.cursor()
+        # Configure window
+        self.columnconfigure((1, 2), weight=1)
 
-    # Execute a query to search for the input word in the 'Kelime' table
-    cursor.execute("SELECT Osmanlica FROM Kelime WHERE latince = ?", (word,))
-    result = cursor.fetchmany(5)
+        # Create entry
+        entry_var = ctk.StringVar()
+        self.entry = ctk.CTkEntry(self, placeholder_text="Kelimeyi giriniz", textvariable=entry_var)
+        self.entry.grid(row=0, column=1, ipadx=330, pady=5, columnspan=2)
+        self.entry.focus_set()
+        entry_var.trace("w", self.search_word)
 
-    # Check if the word was found
-    if result:
-        for row in result:
-            corresponding_word = row
-            print(f"{corresponding_word}\n")
-    else:
-        print(f"No corresponding word found for '{word}'.")
+    def search_word(self, *args):
+        word = self.entry.get()
 
-    # Close the database connection
-    conn.close()
+        # Connect to database
+        conn = sqlite3.connect("imlakilavuzu3.db")
+        cursor = conn.cursor()
 
+        # Execute a query to search for the intended word in database
+        try:
+            cursor.execute("SELECT Osmanlica FROM Kelime WHERE latince = ?", (word,))
+            result = cursor.fetchall()
+        except sqlite3.Error as error:
+            print(error)
 
-search_word = ""
+        if result:
+            i = 0
+            for corresponding_word in result:
+                i += 1
+                # This code is for linux computers. Linux based systems don't have built-in
+                # support for arabic fonts unlike Windows
+                corresponding_word = str(corresponding_word)[8:-3]
+                corresponding_word = arabic_reshaper.reshape(corresponding_word)
+                corresponding_word = get_display(corresponding_word)
+
+                # print(str(corresponding_word)[8:-3])
+                self.text = ctk.CTkLabel(self, width=150, text=corresponding_word, font=("Arial", 16))
+                self.text.grid(row=i, column=1)
+                self.text.setvar(word)
+        # else:
+        #     alert = f"'{word}' için eşleşen bir kelime bulunamadı."
+        #     self.text = ctk.CTkLabel(self, width=80, text=alert)
+        #     self.text.grid(row=1, column=1)
+
 
 if __name__ == "__main__":
-
-    # search_word = input("Enter the word to search: ")
-    while True:
-        event = keyboard.read_event()
-        if event.event_type == keyboard.KEY_DOWN:
-            key = event.name
-            if key == "backspace":
-                search_word = search_word[:-1]
-                print(f"{search_word}\n")
-            elif key == "space":
-                search_word = search_word + " "
-                print(f"{search_word}\n")
-            else:
-                search_word += key
-                print(f"{search_word}\n")
-            if search_word != "":
-                # Call the function to search for the word in the database
-                search_word_in_database(search_word)
-
-                # Ask user to input a word to search
-                # search_word = input("Enter the word to search: ")
-
-                # if user enters exit keyword break the loop
-                if search_word == "exit":
-                    break
+    app = App()
+    app.mainloop()
