@@ -1,6 +1,6 @@
 # osmanlica-imla
 
-free open-source osmanlica-imla lugati
+free open-source osmanlica-imla lugati for linux
 
 Before making it an app change "/home/pardusumsu/code"
 with the exact location of the project in your computer.
